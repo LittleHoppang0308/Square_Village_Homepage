@@ -57,22 +57,6 @@
   ],
   "posts": [
     {
-      "id": "s1",
-      "board": "update",
-      "title": "26.2 대규모 패치 — 돌파력 시스템 오픈, 공·방·체 30레벨 구조 안내",
-      "body": "돌파력이 열렸습니다.\n\n공격력·방어력·체력을 각각 30레벨까지 올리면 돌파 단계가 +1 오르고 진행도가 초기화됩니다.\n누적 레벨 기준으로 능력치를 계산하므로 초기화되어도 올린 만큼은 그대로 남습니다.\n\n세 스탯을 균등하게 올려야 단계가 오릅니다. 한 스탯만 올리면 30에서 막힙니다.",
-      "author": "야채호빵",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-07T21:00:00Z",
-      "editedAt": null,
-      "reactions": 4,
-      "commentCount": 5,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "s2",
       "board": "update",
       "title": "몬스터 드롭 개편 — 막타 30초 소유 후 60초 전체 공개로 변경",
