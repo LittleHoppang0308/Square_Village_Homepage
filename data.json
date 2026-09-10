@@ -231,24 +231,6 @@
       "images": [],
       "pinned": false,
       "source": "seed"
-    },
-    {
-      "id": "1511778568022130831",
-      "board": "notice",
-      "title": "[2026.06.04] 위키 공개 안내",
-      "body": "",
-      "author": "야채호빵",
-      "fromBot": false,
-      "channelId": "1511778568022130831",
-      "createdAt": "2026-06-03T17:08:18.104000+00:00",
-      "editedAt": null,
-      "reactions": 10,
-      "commentCount": 0,
-      "images": [],
-      "pinned": false,
-      "source": "discord",
-      "kind": "forum",
-      "discordId": "1511778568022130831"
     }
   ],
   "comments": [],
