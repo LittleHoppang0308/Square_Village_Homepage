@@ -57,22 +57,6 @@
   ],
   "posts": [
     {
-      "id": "c1",
-      "board": "shot",
-      "title": "스타포스 12성 성공했습니다 (feat. 파괴방지권 3장)",
-      "body": "드디어 성공했습니다. 방지권 3장 태웠습니다...",
-      "author": "하늘",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-09T20:48:00Z",
-      "editedAt": null,
-      "reactions": 9,
-      "commentCount": 8,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "c2",
       "board": "guild",
       "title": "[반짝반짝] 주말 보스 같이 도실 분 5자리 남았어요",
