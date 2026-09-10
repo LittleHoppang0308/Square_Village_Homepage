@@ -55,24 +55,7 @@
       "href": "https://github.com/LittleHoppang0308/squarevillage-launcher/releases/latest"
     }
   ],
-  "posts": [
-    {
-      "id": "s4",
-      "board": "patch",
-      "title": "강화 쿨타임 1.2초 적용 · 스타포스 파괴 방지권 가격 조정",
-      "body": "· 강화 연출이 끝나기 전에는 다시 강화할 수 없도록 1.2초 쿨타임을 넣었습니다.\n· 성장 강화 파괴 방지 비용을 단계별로 다시 잡았습니다.\n· 사망 시 레벨 표시가 사라지던 문제를 고쳤습니다.",
-      "author": "야채호빵",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-08-29T21:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 0,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    }
-  ],
+  "posts": [],
   "comments": [],
   "events": [
     {
