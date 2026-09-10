@@ -233,22 +233,6 @@
       "source": "seed"
     },
     {
-      "id": "s5",
-      "board": "notice",
-      "title": "길드 창설 비용 인하 및 길드 스탯 최대 레벨 상향 안내",
-      "body": "길드 창설 비용을 내리고 길드 스탯 최대 레벨을 올렸습니다.\n후원금은 길드 예산이 되고, 길드장이 구매한 길드 스탯은 길드원 전원에게 버프로 들어갑니다.",
-      "author": "야채호빵",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-08-26T21:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 0,
-      "images": [],
-      "pinned": true,
-      "source": "seed"
-    },
-    {
       "id": "1511778568022130831",
       "board": "notice",
       "title": "[2026.06.04] 위키 공개 안내",
