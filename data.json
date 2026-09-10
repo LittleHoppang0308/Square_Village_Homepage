@@ -137,22 +137,6 @@
       "source": "seed"
     },
     {
-      "id": "c7",
-      "board": "qna",
-      "title": "보석은 무기랑 방어구 슬롯이 따로인가요?",
-      "body": "무기 보석은 6번, 방어구 보석은 8번 슬롯입니다. 역할이 고정이라 무기 보석은 공격력 %, 방어구 보석은 방어 %만 붙습니다.",
-      "author": "감자칩",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-07T17:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 2,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "s2",
       "board": "update",
       "title": "몬스터 드롭 개편 — 막타 30초 소유 후 60초 전체 공개로 변경",
