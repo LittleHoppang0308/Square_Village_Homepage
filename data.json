@@ -57,6 +57,23 @@
   ],
   "posts": [
     {
+      "id": "wmtv8zeefatqs3",
+      "board": "notice",
+      "title": "홈페이지 테스트",
+      "body": "홈페이지 테스트",
+      "author": "야채호빵",
+      "authorId": "232533736347009025",
+      "authorAvatar": "b995c9bc4340142cac090ad90eb5ab8b",
+      "createdAt": "2026-09-10T08:10:37.863Z",
+      "editedAt": null,
+      "images": [],
+      "reactions": 0,
+      "pinned": false,
+      "source": "web",
+      "channelId": "1547519656531722320",
+      "discordId": "1547519656531722320"
+    },
+    {
       "id": "c1",
       "board": "shot",
       "title": "스타포스 12성 성공했습니다 (feat. 파괴방지권 3장)",
