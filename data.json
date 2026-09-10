@@ -57,6 +57,24 @@
   ],
   "posts": [
     {
+      "id": "1547518698892300298",
+      "board": "notice",
+      "title": "아ㅏㅇ 테스트",
+      "body": "아아 테스트",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "1547518698892300298",
+      "createdAt": "2026-09-10T08:06:49.323000+00:00",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 0,
+      "images": [],
+      "pinned": false,
+      "source": "discord",
+      "kind": "forum",
+      "discordId": "1547518698892300298"
+    },
+    {
       "id": "c1",
       "board": "shot",
       "title": "스타포스 12성 성공했습니다 (feat. 파괴방지권 3장)",
@@ -426,9 +444,9 @@
     }
   ],
   "sync": {
-    "lastRunAt": "2026-09-10T07:50:04.381Z",
+    "lastRunAt": "2026-09-10T08:07:54.472Z",
     "cursors": {
-      "1511650070385397800": "1511778568022130831"
+      "1511650070385397800": "1547518698892300298"
     }
   }
 }
