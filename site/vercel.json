@@ -2,8 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "crons": [
-    {
-      "path": "/api/sync/discord",
-      "schedule": "0 4 * * *"
-    }
+    { "path": "/api/sync/discord", "schedule": "0 4 * * *" }
   ]
+}
