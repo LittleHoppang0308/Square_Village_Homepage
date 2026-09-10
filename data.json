@@ -57,22 +57,6 @@
   ],
   "posts": [
     {
-      "id": "s3",
-      "board": "event",
-      "title": "추석 보름달 사냥 — 경험치 2배 물약 & 보름달 상자 드롭",
-      "body": "9월 12일 ~ 9월 22일\n\n밤 시간대 사냥터에서 경험치 2배 물약과 보름달 상자가 추가로 드롭됩니다.\n보름달 상자에서는 강화 주문서와 파괴 방지권이 나옵니다.",
-      "author": "야채호빵",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-02T21:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 0,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "s4",
       "board": "patch",
       "title": "강화 쿨타임 1.2초 적용 · 스타포스 파괴 방지권 가격 조정",
