@@ -1,4 +1,5 @@
 import { DISCORD_API, DISCORD_BOT_TOKEN, DISCORD_GUILD_ID } from './env';
+import { cleanContent, guildLookups } from './discordText';
 
 export const LIMITS = {
   messagesPerChannel: 25,   // 한 번 돌 때 채널당 최대 처리 건수
@@ -62,9 +63,14 @@ export function isImage(a) {
   );
 }
 
+/** 길드의 역할·채널 이름표 (멘션을 사람이 읽는 형태로 바꾸는 데 쓴다) */
+export async function lookups() {
+  return guildLookups(dc, DISCORD_GUILD_ID);
+}
+
 /** 디스코드 메시지를 게시글 형태로 바꾼다 */
-export function toPost(msg, boardSlug) {
-  const content = (msg.content || '').replace(/\r/g, '').trim();
+export function toPost(msg, boardSlug, ctx = {}) {
+  const content = cleanContent(msg.content, { ...ctx, mentions: msg.mentions });
   const lines = content.split('\n');
   const rawTitle = (lines.find((l) => l.trim().length > 0) || '').trim();
   const imageCount = (msg.attachments || []).filter(isImage).length;
@@ -206,8 +212,8 @@ export async function starterMessage(threadId) {
 }
 
 /** 포럼 스레드 + 첫 메시지 → 게시글 */
-export function threadToPost(thread, starter, boardSlug) {
-  const content = (starter?.content || '').replace(/\r/g, '').trim();
+export function threadToPost(thread, starter, boardSlug, ctx = {}) {
+  const content = cleanContent(starter?.content, { ...ctx, mentions: starter?.mentions });
   let title = String(thread.name || '').trim();
   if (title.length > LIMITS.titleChars) title = `${title.slice(0, LIMITS.titleChars).trimEnd()}…`;
 

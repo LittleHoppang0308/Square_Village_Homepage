@@ -24,9 +24,23 @@ export function parseDoc(text) {
 
     if (!trimmed) { flushPara(); continue; }
 
-    if (/^##\s+/.test(trimmed)) {
+    // 디스코드는 # / ## / ### 세 단계를 쓴다
+    const head = trimmed.match(/^(#{1,3})\s+(.*)$/);
+    if (head) {
       flushPara();
-      blocks.push({ type: 'h', text: trimmed.replace(/^##\s+/, '') });
+      blocks.push({ type: 'h', level: head[1].length, text: head[2] });
+      continue;
+    }
+
+    if (/^>\s?/.test(trimmed)) {
+      flushPara();
+      const lines2 = [];
+      while (i < lines.length && /^>\s?/.test(lines[i].trim())) {
+        lines2.push(lines[i].trim().replace(/^>\s?/, ''));
+        i += 1;
+      }
+      i -= 1;
+      blocks.push({ type: 'quote', lines: lines2 });
       continue;
     }
 
@@ -73,17 +87,33 @@ export function parseDoc(text) {
   return blocks;
 }
 
-/** `**굵게**`, `` `코드` ``, URL 을 조각으로 나눈다 */
+/**
+ * 인라인 서식을 조각으로 나눈다.
+ * `[글자](주소)` · `**굵게**` · `*기울임*` · `__밑줄__` · `~~취소~~` · `` `코드` `` · 맨 URL
+ */
 export function inline(text) {
   const out = [];
-  const re = /(\*\*[^*]+\*\*)|(`[^`]+`)|(https?:\/\/[^\s<>"')]+)/g;
+  const re = new RegExp([
+    '\\[([^\\]]+)\\]\\((https?:\\/\\/[^)\\s]+)\\)', // 마크다운 링크
+    '(`[^`]+`)',
+    '(\\*\\*[^*]+\\*\\*)',
+    '(~~[^~]+~~)',
+    '(__[^_]+__)',
+    '(\\*[^*\\n]+\\*)',
+    '(https?:\\/\\/[^\\s<>"\')]+)',
+  ].join('|'), 'g');
+
   let last = 0;
   let m;
   while ((m = re.exec(text)) !== null) {
     if (m.index > last) out.push({ t: 'text', v: text.slice(last, m.index) });
-    if (m[1]) out.push({ t: 'b', v: m[1].slice(2, -2) });
-    else if (m[2]) out.push({ t: 'code', v: m[2].slice(1, -1) });
-    else out.push({ t: 'link', v: m[3] });
+    if (m[1] && m[2]) out.push({ t: 'link', v: m[2], label: m[1] });
+    else if (m[3]) out.push({ t: 'code', v: m[3].slice(1, -1) });
+    else if (m[4]) out.push({ t: 'b', v: m[4].slice(2, -2) });
+    else if (m[5]) out.push({ t: 's', v: m[5].slice(2, -2) });
+    else if (m[6]) out.push({ t: 'u', v: m[6].slice(2, -2) });
+    else if (m[7]) out.push({ t: 'i', v: m[7].slice(1, -1) });
+    else if (m[8]) out.push({ t: 'link', v: m[8] });
     last = m.index + m[0].length;
   }
   if (last < text.length) out.push({ t: 'text', v: text.slice(last) });

@@ -5,9 +5,10 @@ import { board, channelMap } from '@/lib/boards';
 import { buildMenu } from '@/lib/menu';
 import { getSession } from '@/lib/session';
 import { LAUNCHER_REPO, hasAuth } from '@/lib/env';
-import { ymdhm, toBlocks } from '@/lib/format';
+import { ymdhm } from '@/lib/format';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
+import DocBody from '@/components/DocBody';
 import Comments from '@/components/Comments';
 import PostActions from '@/components/PostActions';
 import Icon from '@/components/Icons';
@@ -40,7 +41,6 @@ export default async function PostPage({ params }) {
 
   const { bySlug } = channelMap();
   const launcherUrl = LAUNCHER_REPO ? `https://github.com/${LAUNCHER_REPO}/releases/latest` : '#';
-  const blocks = toBlocks(post.body);
   const canDelete = Boolean(user && (user.id === post.authorId || user.staff));
 
   return (
@@ -74,15 +74,7 @@ export default async function PostPage({ params }) {
             </div>
 
             <div className="body">
-              {blocks.map((line, i) => (
-                <p key={i}>
-                  {line.length === 0 ? ' ' : line.map((part, j) => (
-                    part.t === 'link'
-                      ? <a key={j} href={part.v} target="_blank" rel="noopener noreferrer nofollow">{part.v}</a>
-                      : <span key={j}>{part.v}</span>
-                  ))}
-                </p>
-              ))}
+              <DocBody text={post.body} />
             </div>
 
             {post.images?.length ? (

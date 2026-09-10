@@ -44,7 +44,23 @@ const threads = [
     thread_metadata: { create_timestamp: new Date(now - 2 * 86400000).toISOString(), archived: false } },
 ];
 const starters = {
-  '9201': { id: '9201', type: 0, content: '안녕하세요.\n2026.06.04 리뉴얼 위키가 공개되었습니다.', channel_id: '9201',
+  '9201': { id: '9201', type: 0, channel_id: '9201',
+    content: [
+      '**안녕하세요.**',
+      '2026.06.04 리뉴얼 위키가 공개 되었습니다.',
+      '',
+      '## 공지사항',
+      '스퀘어 빌리지 위키를 공개합니다.',
+      '',
+      '> 오타나 잘못된 정보가 있으면 알려주세요',
+      '',
+      '- 신규 위키 페이지 링크 공개',
+      '',
+      '[위키 바로가기](https://example.notion.site/wiki)',
+      '<@&333333333333333333> <#100000000000000111> <:blueberry:12345> <t:1780000000:D>',
+      '-# 작은 글씨 안내',
+    ].join('\n'),
+    mentions: [],
     author: { username: 'hoppang0308', global_name: '야채호빵', bot: false },
     timestamp: new Date(now - 40 * 86400000).toISOString(), edited_timestamp: null,
     attachments: [{ id: 'w1', filename: 'wiki.png', content_type: 'image/png', size: 68, url: `http://127.0.0.1:${PORT}/cdn/w1.png` }],
@@ -96,6 +112,12 @@ createServer(async (req, res) => {
   if (chInfo && req.method === 'GET') {
     const id = chInfo[1];
     return json({ id, type: id === FORUM_ID ? 15 : 0, name: id === FORUM_ID ? '공지사항' : '자유수다' });
+  }
+  if (p === `/dc/guilds/${GUILD_ID}/roles`) {
+    return json([{ id: '333333333333333333', name: '🌿 | 스빌외전2리뉴얼_스트리머' }, { id: STAFF_ROLE, name: '운영진' }]);
+  }
+  if (p === `/dc/guilds/${GUILD_ID}/channels`) {
+    return json([{ id: '100000000000000111', name: '자유수다' }, { id: FORUM_ID, name: '공지사항' }]);
   }
   if (p === `/dc/guilds/${GUILD_ID}/threads/active`) {
     return json({ threads: threads.filter((t) => !t.thread_metadata.archived), members: [] });

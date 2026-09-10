@@ -3,7 +3,7 @@ import { channelMap } from '@/lib/boards';
 import { readDataFresh, mutateData } from '@/lib/data';
 import {
   newMessages, recentMessages, toPost, fetchAttachments, LIMITS,
-  channelKind, newThreads, starterMessage, threadToPost, KIND,
+  channelKind, newThreads, starterMessage, threadToPost, KIND, lookups,
 } from '@/lib/discord';
 import { botUserId } from '@/lib/discordApi';
 import { DISCORD_BOT_TOKEN, SYNC_SECRET, CRON_SECRET, SYNC_FIRST_RUN, hasGithub } from '@/lib/env';
@@ -45,6 +45,8 @@ async function run(req) {
   /* 우리 봇이 보낸 메시지는 다시 수집하지 않는다.
      웹에서 쓴 글을 봇이 디스코드로 보내는데, 그것을 되읽으면 글이 두 번 생긴다. */
   const selfId = await botUserId();
+  // 멘션·채널 표기를 사람이 읽는 형태로 바꾸기 위한 이름표 (한 번만 받는다)
+  const ctx = await lookups();
 
   const snapshot = await readDataFresh();
   const cursors = { ...(snapshot.sync?.cursors || {}) };
@@ -61,6 +63,10 @@ async function run(req) {
   const imageFiles = [];
   const added = [];
   const report = {};
+  /* 본문이 빈 채로 들어온 건수.
+     Message Content 특권 인텐트가 꺼져 있으면 디스코드가 content·attachments 를
+     비워서 준다. 제목·작성자·시각만 들어오고 본문이 비면 거의 이것이 원인이다. */
+  let blank = 0;
 
   for (const [slug, channelId] of entries) {
     try {
@@ -79,11 +85,12 @@ async function run(req) {
           const starter = await starterMessage(thread.id);
           if (selfId && starter?.author?.id === selfId) continue;
 
-          const post = threadToPost(thread, starter, slug);
+          const post = threadToPost(thread, starter, slug, ctx);
           if (starter) {
             const { files, paths } = await fetchAttachments(starter, slug, budget);
             post.images = paths;
             imageFiles.push(...files);
+            if (!post.body && !paths.length) blank += 1;
           }
           added.push(post);
           seen.add(`${slug}:${thread.id}`);
@@ -100,10 +107,11 @@ async function run(req) {
           if (selfId && msg.author?.id === selfId) continue;
           if (seen.has(`${slug}:${msg.id}`)) continue;
 
-          const post = toPost(msg, slug);
+          const post = toPost(msg, slug, ctx);
           const { files, paths } = await fetchAttachments(msg, slug, budget);
           post.images = paths;
           imageFiles.push(...files);
+          if (!post.body && !paths.length) blank += 1;
           added.push(post);
           seen.add(`${slug}:${msg.id}`);
           count += 1;
@@ -115,9 +123,15 @@ async function run(req) {
     }
   }
 
+  const hint = blank
+    ? `본문이 빈 글 ${blank}건 — Developer Portal → Bot → Privileged Gateway Intents 에서 `
+      + 'MESSAGE CONTENT INTENT 를 켜세요. 꺼져 있으면 디스코드가 본문과 첨부를 비워서 줍니다. '
+      + '켠 뒤 data.json 의 sync.cursors 를 비우고 다시 동기화하면 본문이 채워집니다.'
+    : undefined;
+
   const cursorsChanged = JSON.stringify(cursors) !== JSON.stringify(snapshot.sync?.cursors || {});
   if (!added.length && !cursorsChanged) {
-    return NextResponse.json({ ok: true, added: 0, report, at: new Date().toISOString() });
+    return NextResponse.json({ ok: true, added: 0, report, hint, at: new Date().toISOString() });
   }
 
   await mutateData((data) => {
@@ -135,11 +149,14 @@ async function run(req) {
     ? `feat(sync): 디스코드 새 글 ${r.addedCount}건${imageFiles.length ? ` · 이미지 ${imageFiles.length}장` : ''}`
     : 'chore(sync): 디스코드 커서 갱신'));
 
+  if (hint) console.warn('[sync]', hint);
+
   return NextResponse.json({
     ok: true,
     added: added.length,
     images: imageFiles.length,
     report,
+    hint,
     at: new Date().toISOString(),
   });
 }
