@@ -57,22 +57,6 @@
   ],
   "posts": [
     {
-      "id": "c2",
-      "board": "guild",
-      "title": "[반짝반짝] 주말 보스 같이 도실 분 5자리 남았어요",
-      "body": "주말 저녁 9시에 모여서 보스 돕니다.\n레벨 제한은 80 이상이고, 길드 스탯은 전부 5레벨까지 올려뒀습니다.",
-      "author": "블루베리",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-09T20:00:00Z",
-      "editedAt": null,
-      "reactions": 2,
-      "commentCount": 6,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "c5",
       "board": "suggest",
       "title": "데미지 스킨 glyph 크기 조절 옵션 있으면 좋겠어요",
