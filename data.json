@@ -89,22 +89,6 @@
       "source": "seed"
     },
     {
-      "id": "c4",
-      "board": "free",
-      "title": "돌파력은 공·방·체 균등하게 올려야 단계가 오릅니다",
-      "body": "한 스탯만 올리면 그 스탯이 30에서 막혀서 돌파 단계가 안 오릅니다. 세 개 같이 올리세요.",
-      "author": "야채호빵",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-09T16:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 2,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "c5",
       "board": "suggest",
       "title": "데미지 스킨 glyph 크기 조절 옵션 있으면 좋겠어요",
