@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { channelMap } from '@/lib/boards';
 import { readDataFresh, mutateData } from '@/lib/data';
-import { newMessages, recentMessages, toPost, fetchAttachments, LIMITS } from '@/lib/discord';
+import {
+  newMessages, recentMessages, toPost, fetchAttachments, LIMITS,
+  channelKind, newThreads, starterMessage, threadToPost, KIND,
+} from '@/lib/discord';
 import { botUserId } from '@/lib/discordApi';
 import { DISCORD_BOT_TOKEN, SYNC_SECRET, CRON_SECRET, SYNC_FIRST_RUN, hasGithub } from '@/lib/env';
 
@@ -61,27 +64,52 @@ async function run(req) {
 
   for (const [slug, channelId] of entries) {
     try {
+      const kind = await channelKind(channelId);
       const cursor = cursors[channelId];
-      const msgs = cursor
-        ? await newMessages(channelId, cursor)
-        : await recentMessages(channelId, SYNC_FIRST_RUN);
-
       let count = 0;
-      for (const msg of msgs) {
-        // 실패한 건이 있어도 커서는 전진시켜 같은 메시지를 무한히 다시 시도하지 않는다
-        cursors[channelId] = msg.id;
-        if (selfId && msg.author?.id === selfId) continue;
-        if (seen.has(`${slug}:${msg.id}`)) continue;
 
-        const post = toPost(msg, slug);
-        const { files, paths } = await fetchAttachments(msg, slug, budget);
-        post.images = paths;
-        imageFiles.push(...files);
-        added.push(post);
-        seen.add(`${slug}:${msg.id}`);
-        count += 1;
+      if (kind === KIND.FORUM) {
+        /* 포럼·미디어 채널 — 스레드 하나가 글 하나다.
+           스레드 이름이 제목, 첫 메시지가 본문이 된다. */
+        const threads = await newThreads(channelId, cursor, SYNC_FIRST_RUN);
+        for (const thread of threads) {
+          cursors[channelId] = thread.id;
+          if (seen.has(`${slug}:${thread.id}`)) continue;
+
+          const starter = await starterMessage(thread.id);
+          if (selfId && starter?.author?.id === selfId) continue;
+
+          const post = threadToPost(thread, starter, slug);
+          if (starter) {
+            const { files, paths } = await fetchAttachments(starter, slug, budget);
+            post.images = paths;
+            imageFiles.push(...files);
+          }
+          added.push(post);
+          seen.add(`${slug}:${thread.id}`);
+          count += 1;
+        }
+      } else {
+        const msgs = cursor
+          ? await newMessages(channelId, cursor)
+          : await recentMessages(channelId, SYNC_FIRST_RUN);
+
+        for (const msg of msgs) {
+          // 실패한 건이 있어도 커서는 전진시켜 같은 메시지를 무한히 다시 시도하지 않는다
+          cursors[channelId] = msg.id;
+          if (selfId && msg.author?.id === selfId) continue;
+          if (seen.has(`${slug}:${msg.id}`)) continue;
+
+          const post = toPost(msg, slug);
+          const { files, paths } = await fetchAttachments(msg, slug, budget);
+          post.images = paths;
+          imageFiles.push(...files);
+          added.push(post);
+          seen.add(`${slug}:${msg.id}`);
+          count += 1;
+        }
       }
-      report[slug] = count;
+      report[slug] = kind === KIND.FORUM ? `포럼 ${count}건` : count;
     } catch (e) {
       report[slug] = `오류: ${e.message}`;
     }

@@ -30,11 +30,31 @@ const blobs = new Map();
 let refSha = 'sha-root';
 let sentCount = 0;
 let lastCode = '';
+const now = Date.now();
 const BOT_ID = '999999999999999999';
 const USER_ID = '111111111111111111';
 const STAFF_ROLE = '222222222222222222';
+const FORUM_ID = '100000000000000333';
+const GUILD_ID = '555555555555555555';
+// 포럼 스레드 = 게시물 하나. id 는 첫 메시지 id 와 같다.
+const threads = [
+  { id: '9201', parent_id: FORUM_ID, name: '[2026.06.04] 위키 공개 안내', message_count: 1, flags: 0,
+    thread_metadata: { create_timestamp: new Date(now - 40 * 86400000).toISOString(), archived: true } },
+  { id: '9202', parent_id: FORUM_ID, name: '[2026.09.08] 돌파력 시스템 오픈', message_count: 3, flags: 2,
+    thread_metadata: { create_timestamp: new Date(now - 2 * 86400000).toISOString(), archived: false } },
+];
+const starters = {
+  '9201': { id: '9201', type: 0, content: '안녕하세요.\n2026.06.04 리뉴얼 위키가 공개되었습니다.', channel_id: '9201',
+    author: { username: 'hoppang0308', global_name: '야채호빵', bot: false },
+    timestamp: new Date(now - 40 * 86400000).toISOString(), edited_timestamp: null,
+    attachments: [{ id: 'w1', filename: 'wiki.png', content_type: 'image/png', size: 68, url: `http://127.0.0.1:${PORT}/cdn/w1.png` }],
+    reactions: [{ count: 9 }], pinned: false },
+  '9202': { id: '9202', type: 0, content: '공격력·방어력·체력을 각 30레벨까지 올리면 돌파 단계가 +1 오릅니다.', channel_id: '9202',
+    author: { username: 'hoppang0308', global_name: '야채호빵', bot: false },
+    timestamp: new Date(now - 2 * 86400000).toISOString(), edited_timestamp: null,
+    attachments: [], reactions: [], pinned: true },
+};
 
-const now = Date.now();
 const messages = {
   '100000000000000111': [
     msg('9001', '오늘 보스 같이 도실 분\n9시에 모입니다', '야채호빵', 5),
@@ -69,6 +89,33 @@ createServer(async (req, res) => {
   if (p.startsWith('/cdn/')) {
     res.writeHead(200, { 'Content-Type': 'image/png' });
     return res.end(PNG);
+  }
+
+  // ── 포럼 ──
+  const chInfo = p.match(/^\/dc\/channels\/(\d+)$/);
+  if (chInfo && req.method === 'GET') {
+    const id = chInfo[1];
+    return json({ id, type: id === FORUM_ID ? 15 : 0, name: id === FORUM_ID ? '공지사항' : '자유수다' });
+  }
+  if (p === `/dc/guilds/${GUILD_ID}/threads/active`) {
+    return json({ threads: threads.filter((t) => !t.thread_metadata.archived), members: [] });
+  }
+  const arch = p.match(/^\/dc\/channels\/(\d+)\/threads\/archived\/public$/);
+  if (arch) {
+    return json({ threads: threads.filter((t) => t.parent_id === arch[1] && t.thread_metadata.archived), has_more: false });
+  }
+  const starter = p.match(/^\/dc\/channels\/(\d+)\/messages\/(\d+)$/);
+  if (starter && req.method === 'GET' && starters[starter[2]]) {
+    return json(starters[starter[2]]);
+  }
+  const mkThread = p.match(/^\/dc\/channels\/(\d+)\/threads$/);
+  if (mkThread && req.method === 'POST') {
+    const b = JSON.parse(body);
+    sentCount += 1;
+    console.log(`→ 포럼 게시물 생성 (채널 ${mkThread[1]})`);
+    console.log(`   제목: ${b.name}`);
+    console.log(`   본문: ${(b.message?.content || '').replace(/\n/g, ' / ')}`);
+    return json({ id: `thread${sentCount}`, name: b.name, parent_id: mkThread[1] });
   }
 
   // ── 디스코드 OAuth2 · 봇 ──

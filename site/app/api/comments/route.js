@@ -30,7 +30,12 @@ export async function POST(req) {
 
     // 원본 메시지의 답장으로 보낸다 (디스코드에서 온 글이든 웹에서 쓴 글이든 ID 가 있다)
     mirrored = await mirrorComment({
-      board: slug, body, author: user.name, replyTo: post.discordId || null,
+      board: slug,
+      body,
+      author: user.name,
+      replyTo: post.discordId || null,
+      postChannelId: post.channelId || null,
+      isForum: post.kind === 'forum',
     });
 
     const comment = {
