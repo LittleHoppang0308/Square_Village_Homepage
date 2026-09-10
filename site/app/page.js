@@ -1,7 +1,9 @@
-import { getData } from '@/lib/data';
+import { getData, withCounts } from '@/lib/data';
 import { boardsOf, boardName, channelMap } from '@/lib/boards';
 import { buildMenu } from '@/lib/menu';
-import { LAUNCHER_REPO } from '@/lib/env';
+import { docsOf } from '@/lib/guides';
+import { getSession } from '@/lib/session';
+import { LAUNCHER_REPO, hasAuth } from '@/lib/env';
 import { ago } from '@/lib/format';
 
 import SiteHeader from '@/components/SiteHeader';
@@ -14,14 +16,14 @@ import SiteFooter from '@/components/SiteFooter';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const data = await getData();
+  const [data, user] = await Promise.all([getData(), getSession()]);
   const newsBoards = boardsOf('news');
   const communityBoards = boardsOf('community');
-  const launcherUrl = `https://github.com/${LAUNCHER_REPO}/releases/latest`;
+  const launcherUrl = LAUNCHER_REPO ? `https://github.com/${LAUNCHER_REPO}/releases/latest` : '#';
   const { bySlug } = channelMap();
   const syncedAgo = data.sync?.lastRunAt ? ago(data.sync.lastRunAt) : '';
 
-  const withName = (list) => list.map((p) => ({ ...p, boardName: boardName(p.board) }));
+  const withName = (list) => withCounts(data, list).map((p) => ({ ...p, boardName: boardName(p.board) }));
   const pick = (boards, limit) => {
     const set = new Set(boards.map((b) => b.slug));
     return withName(
@@ -39,7 +41,7 @@ export default async function Home() {
           <span className="brandline">SQUAREVILLAGE NETWORK</span>
           <nav>
             <a href={launcherUrl} target="_blank" rel="noopener noreferrer">런처 다운로드</a>
-            <a href="/board/notice">서버 규칙</a>
+            <a href="/guide/rules">서버 규칙</a>
             <a href="/board/suggest">건의</a>
             <a href="/board/qna">문의</a>
             {data.settings.discordInvite
@@ -49,7 +51,12 @@ export default async function Home() {
         </div>
       </div>
 
-      <SiteHeader menu={buildMenu(data, { pathname: '/' })} launcherUrl={launcherUrl} />
+      <SiteHeader
+        menu={buildMenu(data, { pathname: '/' })}
+        launcherUrl={launcherUrl}
+        user={user}
+        authEnabled={hasAuth}
+      />
 
       <Hero banners={data.banners} />
 
@@ -64,6 +71,8 @@ export default async function Home() {
               discordInvite={data.settings.discordInvite}
               channelPairs={Object.keys(bySlug)}
               syncedAgo={syncedAgo}
+              user={user}
+              authEnabled={hasAuth}
             />
           </div>
         </div>
@@ -72,7 +81,7 @@ export default async function Home() {
       <Events events={data.events} />
       <Systems systems={data.systems} />
       <Media videos={data.videos} />
-      <Guides guides={data.guides} />
+      <Guides guides={docsOf(data, 'guide')} />
 
       <SiteFooter
         serverVersion={data.settings.serverVersion}

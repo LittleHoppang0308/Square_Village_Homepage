@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Icon from './Icons';
 import { boardName } from '@/lib/boards';
 
-export default function Rail({ launcher, launcherUrl, discordInvite, channelPairs, syncedAgo }) {
+export default function Rail({ launcher, launcherUrl, discordInvite, channelPairs, syncedAgo, user, authEnabled }) {
   return (
     <div className="rail">
       <div className="launcher">
@@ -24,16 +24,41 @@ export default function Rail({ launcher, launcherUrl, discordInvite, channelPair
       </div>
 
       <div className="login">
-        <h3>디스코드로 시작하기</h3>
-        <p>서버 디스코드 계정으로 로그인하면 게시판 작성과 내 캐릭터 정보 조회가 함께 열립니다.</p>
-        <a
-          className="btn-d"
-          href={discordInvite || '#'}
-          {...(discordInvite ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        >
-          <Icon name="discord" size={16} />디스코드 로그인
-        </a>
-        <Link className="alt" href="/board/qna">마인크래프트 닉네임으로 조회</Link>
+        {user ? (
+          <>
+            <h3>{user.name} 님</h3>
+            <p>
+              {user.staff ? '운영진으로 로그인되어 있습니다. ' : ''}
+              게시판에 글과 댓글을 쓸 수 있습니다. 쓴 글은 디스코드 채널에도 함께 올라갑니다.
+            </p>
+            <Link className="btn-d" href="/board/free/write">
+              <Icon name="discord" size={16} />글쓰기
+            </Link>
+            <span className="altrow">
+              {user.staff ? <Link className="alt" href="/admin">운영</Link> : null}
+              <a className="alt" href="/api/auth/logout">로그아웃</a>
+            </span>
+          </>
+        ) : (
+          <>
+            <h3>디스코드로 시작하기</h3>
+            <p>
+              스퀘어빌리지 디스코드에 참여한 분이면 로그인해서 게시판에 글과 댓글을 쓸 수 있습니다.
+            </p>
+            {authEnabled ? (
+              <a className="btn-d" href="/api/auth/login">
+                <Icon name="discord" size={16} />디스코드로 로그인
+              </a>
+            ) : (
+              <span className="btn-d disabled"><Icon name="discord" size={16} />로그인 준비 중</span>
+            )}
+            {discordInvite ? (
+              <a className="alt" href={discordInvite} target="_blank" rel="noopener noreferrer">
+                아직 디스코드에 없다면 참여하기
+              </a>
+            ) : null}
+          </>
+        )}
       </div>
 
       <div className="dsync">

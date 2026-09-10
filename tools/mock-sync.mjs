@@ -28,6 +28,11 @@ let store = {
 };
 const blobs = new Map();
 let refSha = 'sha-root';
+let sentCount = 0;
+let lastCode = '';
+const BOT_ID = '999999999999999999';
+const USER_ID = '111111111111111111';
+const STAFF_ROLE = '222222222222222222';
 
 const now = Date.now();
 const messages = {
@@ -64,6 +69,42 @@ createServer(async (req, res) => {
   if (p.startsWith('/cdn/')) {
     res.writeHead(200, { 'Content-Type': 'image/png' });
     return res.end(PNG);
+  }
+
+  // ── 디스코드 OAuth2 · 봇 ──
+  if (p === '/dc/oauth2/token' && req.method === 'POST') {
+    // code 를 'stranger' 로 주면 길드 멤버가 아닌 사용자로 흉내낸다 (로그인 차단 시험용)
+    lastCode = new URLSearchParams(body).get('code') || '';
+    console.log(`OAuth 토큰 교환 (code=${lastCode})`);
+    return json({ access_token: 'mock-access-token', token_type: 'Bearer', expires_in: 604800 });
+  }
+  if (p === '/dc/users/@me') {
+    const auth = req.headers.authorization || '';
+    if (auth.startsWith('Bot ')) return json({ id: BOT_ID, username: 'squarevillage-bot', bot: true });
+    if (lastCode === 'stranger') {
+      return json({ id: '777777777777777777', username: 'stranger', global_name: '지나가던사람', avatar: '' });
+    }
+    return json({ id: USER_ID, username: 'hoppang0308', global_name: '야채호빵', avatar: 'avatarhash' });
+  }
+  const mem = p.match(/^\/dc\/guilds\/(\d+)\/members\/(\d+)$/);
+  if (mem) {
+    if (mem[2] !== USER_ID) return json({ message: 'Unknown Member' }, 404);
+    console.log('길드 멤버 확인 → 운영진 역할 있음');
+    return json({ nick: null, roles: [STAFF_ROLE] });
+  }
+  const send = p.match(/^\/dc\/channels\/(\d+)\/messages$/);
+  if (send && req.method === 'POST') {
+    const sent = JSON.parse(body);
+    sentCount += 1;
+    console.log(`→ 디스코드 전송 (채널 ${send[1]})${sent.message_reference ? ' [답장]' : ''}`);
+    console.log(`   ${sent.content.replace(/\n/g, ' / ')}`);
+    return json({ id: `sent${sentCount}`, channel_id: send[1] });
+  }
+  const rm = p.match(/^\/dc\/channels\/(\d+)\/messages\/(\w+)$/);
+  if (rm && req.method === 'DELETE') {
+    console.log(`← 디스코드 메시지 삭제 (${rm[2]})`);
+    res.writeHead(204);
+    return res.end();
   }
 
   // ── 디스코드 ──

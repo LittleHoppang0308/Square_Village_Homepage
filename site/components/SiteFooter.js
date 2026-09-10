@@ -14,8 +14,8 @@ export default function SiteFooter({ serverVersion, launcherUrl, discordInvite }
             </p>
           </div>
           <nav>
-            <Link href="/board/notice">서버 규칙</Link>
-            <Link href="/board/notice">운영 정책</Link>
+            <Link href="/guide/rules">서버 규칙</Link>
+            <Link href="/guide">가이드</Link>
             <Link href="/board/suggest">건의하기</Link>
             <Link href="/board/qna">문의하기</Link>
             <a href={launcherUrl} target="_blank" rel="noopener noreferrer">런처 다운로드</a>

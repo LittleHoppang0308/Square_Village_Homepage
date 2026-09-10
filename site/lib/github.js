@@ -59,20 +59,16 @@ function encodePath(path) {
 
 /**
  * 여러 파일을 커밋 하나로 쓴다 (Git Data API).
- * data.json 과 첨부 이미지를 함께 넣어도 원자적으로 반영되고,
- * 파일마다 sha 를 맞출 필요가 없어 충돌 처리가 단순하다.
+ * data.json 과 첨부 이미지를 함께 넣어도 원자적으로 반영된다.
  *
  * files: [{ path, content: Buffer | string }]
  */
-export async function commitFiles(files, message, attempt = 0) {
+export async function commitFiles(files, message) {
   if (!files.length) return null;
 
-  const refRes = await gh(`/git/ref/heads/${encodeURIComponent(GITHUB_BRANCH)}`);
-  const ref = await refRes.json();
+  const ref = await (await gh(`/git/ref/heads/${encodeURIComponent(GITHUB_BRANCH)}`)).json();
   const parentSha = ref.object.sha;
-
   const parentCommit = await (await gh(`/git/commits/${parentSha}`)).json();
-  const baseTree = parentCommit.tree.sha;
 
   const blobs = [];
   for (const f of files) {
@@ -89,7 +85,7 @@ export async function commitFiles(files, message, attempt = 0) {
   const tree = await (
     await gh('/git/trees', {
       method: 'POST',
-      body: JSON.stringify({ base_tree: baseTree, tree: blobs }),
+      body: JSON.stringify({ base_tree: parentCommit.tree.sha, tree: blobs }),
     })
   ).json();
 
@@ -100,17 +96,13 @@ export async function commitFiles(files, message, attempt = 0) {
     })
   ).json();
 
-  try {
-    await gh(`/git/refs/heads/${encodeURIComponent(GITHUB_BRANCH)}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ sha: commit.sha, force: false }),
-    });
-  } catch (e) {
-    // 그 사이 다른 커밋이 들어왔으면 부모를 다시 잡아 한 번 재시도한다
-    if (attempt < 3 && (e.status === 422 || e.status === 409)) {
-      return commitFiles(files, message, attempt + 1);
-    }
-    throw e;
-  }
+  /* force:false 이므로 그 사이 다른 커밋이 들어왔으면 422/409 로 실패한다.
+     여기서 재시도하면 오래된 내용으로 덮어쓰게 되므로, 재시도는
+     "다시 읽어서 다시 반영"할 수 있는 호출자(lib/data.js 의 mutateData)가 맡는다. */
+  await gh(`/git/refs/heads/${encodeURIComponent(GITHUB_BRANCH)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ sha: commit.sha, force: false }),
+  });
+
   return commit.sha;
 }

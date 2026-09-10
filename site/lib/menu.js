@@ -1,10 +1,11 @@
 import { boardsOf } from './boards';
+import { docsOf } from './guides';
 
 const DAY = 24 * 3600 * 1000;
 
 /**
- * 메가 메뉴를 데이터에서 만든다.
- * 아직 페이지가 없는 항목은 soon: true — 링크 대신 흐린 글자로 표시된다.
+ * 메가 메뉴는 전부 실제로 존재하는 페이지만 가리킨다.
+ * 게시판은 /board/<slug>, 가이드·소개 문서는 /guide/<slug>.
  */
 export function buildMenu(data, { pathname = '/' } = {}) {
   const now = Date.now();
@@ -17,11 +18,18 @@ export function buildMenu(data, { pathname = '/' } = {}) {
     dot: fresh.has(slug),
     current: pathname.startsWith(`/board/${slug}`),
   });
+  const d = (doc) => ({
+    label: doc.name,
+    href: `/guide/${doc.slug}`,
+    current: pathname === `/guide/${doc.slug}`,
+  });
 
   const news = boardsOf('news').map((x) => b(x.slug, x.name));
   const community = boardsOf('community').map((x) => b(x.slug, x.name));
+  const intro = docsOf(data, 'intro').map(d);
+  const guides = docsOf(data, 'guide').map(d);
 
-  return [
+  const columns = [
     {
       label: '서버 소식',
       href: '/board/notice',
@@ -31,14 +39,9 @@ export function buildMenu(data, { pathname = '/' } = {}) {
     },
     {
       label: '게임 소개',
-      href: '/#systems',
-      items: [
-        { label: '콘텐츠 소개', href: '/#systems' },
-        { label: '서버 이야기', soon: true },
-        { label: '지역 안내', soon: true },
-        { label: '주요 NPC', soon: true },
-        { label: '시작 가이드', soon: true },
-      ],
+      href: intro.length ? intro[0].href : '/#systems',
+      current: intro.some((x) => x.current),
+      items: [...intro, { label: '콘텐츠 · 시스템', href: '/#systems' }],
     },
     {
       label: '커뮤니티',
@@ -59,17 +62,18 @@ export function buildMenu(data, { pathname = '/' } = {}) {
         { label: '공식 영상', href: '/#media' },
         { label: '스크린샷', href: '/board/shot' },
         { label: '2차 창작', href: '/board/fanart' },
-        { label: '배경음악', soon: true },
-        { label: '배포 자료', soon: true },
       ],
     },
     {
       label: '가이드',
-      href: '/#guide',
+      href: '/guide',
+      current: pathname === '/guide' || guides.some((x) => x.current),
       items: [
-        ...(data.guides || []).slice(0, 6).map((g) => ({ label: g.name, href: g.href || '/board/tip' })),
-        { label: 'FAQ', href: '/board/qna' },
+        ...guides.slice(0, 8),
+        { label: '질문과 답변', href: '/board/qna' },
       ],
     },
   ];
+
+  return columns.filter((c) => c.items.length > 0);
 }

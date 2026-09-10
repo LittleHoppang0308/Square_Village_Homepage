@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { channelMap } from '@/lib/boards';
-import { readDataFresh, saveData } from '@/lib/data';
+import { readDataFresh, mutateData } from '@/lib/data';
 import { newMessages, recentMessages, toPost, fetchAttachments, LIMITS } from '@/lib/discord';
+import { botUserId } from '@/lib/discordApi';
 import { DISCORD_BOT_TOKEN, SYNC_SECRET, CRON_SECRET, hasGithub } from '@/lib/env';
 
 export const runtime = 'nodejs';
@@ -14,19 +15,14 @@ const FIRST_RUN_COUNT = 10;
 const KEEP_PER_BOARD = 300;
 
 function authorized(req) {
-  const got = req.headers.get('authorization') || '';
-  const token = got.replace(/^Bearer\s+/i, '').trim();
+  const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
   if (SYNC_SECRET && token === SYNC_SECRET) return true;
   if (CRON_SECRET && token === CRON_SECRET) return true;
   return false;
 }
 
-export async function GET(req) {
-  return run(req);
-}
-export async function POST(req) {
-  return run(req);
-}
+export async function GET(req) { return run(req); }
+export async function POST(req) { return run(req); }
 
 async function run(req) {
   if (!authorized(req)) {
@@ -45,9 +41,20 @@ async function run(req) {
     return NextResponse.json({ ok: false, error: 'DISCORD_CHANNELS 매핑이 비어 있습니다' }, { status: 500 });
   }
 
-  const data = await readDataFresh();
-  const cursors = { ...(data.sync?.cursors || {}) };
-  const known = new Set(data.posts.map((p) => `${p.board}:${p.id}`));
+  /* 우리 봇이 보낸 메시지는 다시 수집하지 않는다.
+     웹에서 쓴 글을 봇이 디스코드로 보내는데, 그것을 되읽으면 글이 두 번 생긴다. */
+  const selfId = await botUserId();
+
+  const snapshot = await readDataFresh();
+  const cursors = { ...(snapshot.sync?.cursors || {}) };
+  const seen = new Set();
+  for (const p of snapshot.posts) {
+    seen.add(`${p.board}:${p.id}`);
+    if (p.discordId) seen.add(`${p.board}:${p.discordId}`);
+  }
+  for (const c of snapshot.comments || []) {
+    if (c.discordId) seen.add(`${c.board}:${c.discordId}`);
+  }
 
   const budget = { left: LIMITS.imagesPerRun };
   const imageFiles = [];
@@ -63,15 +70,17 @@ async function run(req) {
 
       let count = 0;
       for (const msg of msgs) {
-        cursors[channelId] = msg.id; // 실패한 글이 있어도 커서는 전진시켜 무한 재시도를 막는다
-        if (known.has(`${slug}:${msg.id}`)) continue;
+        // 실패한 건이 있어도 커서는 전진시켜 같은 메시지를 무한히 다시 시도하지 않는다
+        cursors[channelId] = msg.id;
+        if (selfId && msg.author?.id === selfId) continue;
+        if (seen.has(`${slug}:${msg.id}`)) continue;
 
         const post = toPost(msg, slug);
         const { files, paths } = await fetchAttachments(msg, slug, budget);
         post.images = paths;
         imageFiles.push(...files);
         added.push(post);
-        known.add(`${slug}:${msg.id}`);
+        seen.add(`${slug}:${msg.id}`);
         count += 1;
       }
       report[slug] = count;
@@ -80,23 +89,25 @@ async function run(req) {
     }
   }
 
-  if (!added.length) {
-    // 커서만 움직였을 수도 있으니 변화가 있으면 저장한다
-    const cursorsChanged = JSON.stringify(cursors) !== JSON.stringify(data.sync?.cursors || {});
-    if (cursorsChanged) {
-      data.sync = { lastRunAt: new Date().toISOString(), cursors };
-      await saveData(data, 'chore(sync): 디스코드 커서 갱신');
-    }
+  const cursorsChanged = JSON.stringify(cursors) !== JSON.stringify(snapshot.sync?.cursors || {});
+  if (!added.length && !cursorsChanged) {
     return NextResponse.json({ ok: true, added: 0, report, at: new Date().toISOString() });
   }
 
-  const merged = [...added, ...data.posts];
-  data.posts = trim(merged);
-  data.sync = { lastRunAt: new Date().toISOString(), cursors };
-
-  const msg = `feat(sync): 디스코드 새 글 ${added.length}건` +
-    (imageFiles.length ? ` · 이미지 ${imageFiles.length}장` : '');
-  await saveData(data, msg, imageFiles);
+  await mutateData((data) => {
+    // 다시 읽은 데이터 기준으로 중복을 걸러 낸다 (그 사이 웹에서 글이 올라왔을 수 있다)
+    const have = new Set();
+    for (const p of data.posts) {
+      have.add(`${p.board}:${p.id}`);
+      if (p.discordId) have.add(`${p.board}:${p.discordId}`);
+    }
+    const fresh = added.filter((p) => !have.has(`${p.board}:${p.id}`));
+    data.posts = trim([...fresh, ...data.posts]);
+    data.sync = { lastRunAt: new Date().toISOString(), cursors };
+    return { files: imageFiles, addedCount: fresh.length };
+  }, (r) => (r.addedCount
+    ? `feat(sync): 디스코드 새 글 ${r.addedCount}건${imageFiles.length ? ` · 이미지 ${imageFiles.length}장` : ''}`
+    : 'chore(sync): 디스코드 커서 갱신'));
 
   return NextResponse.json({
     ok: true,

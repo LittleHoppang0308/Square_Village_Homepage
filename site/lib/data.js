@@ -30,7 +30,7 @@ async function loadLocal() {
   }
 }
 
-/** 30초 캐시. 동기화가 끝나면 revalidateTag 로 즉시 무효화된다. */
+/** 30초 캐시. 쓰기가 끝나면 revalidateTag 로 즉시 무효화된다. */
 export const getData = unstable_cache(load, [TAG], { revalidate: 30, tags: [TAG] });
 
 /** 캐시를 거치지 않는 읽기 — 쓰기 직전에만 사용한다 */
@@ -39,19 +39,41 @@ export async function readDataFresh() {
   return withDefaults(await readJson(DATA_PATH, EMPTY));
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 /**
- * data.json 과 (있으면) 추가 파일을 커밋 하나로 저장한다.
- * extraFiles: [{ path, content: Buffer }]
+ * 읽기 → 수정 → 커밋. 그 사이 다른 사람이 커밋했으면 처음부터 다시 한다.
+ *
+ * 여러 사람이 동시에 글을 써도 서로의 글을 덮어쓰지 않는 유일한 방법이다.
+ * apply(data) 는 data 를 직접 수정하고, 필요하면
+ * { files: [{path, content}] } 를 돌려 이미지 등을 같은 커밋에 함께 넣을 수 있다.
+ * { skip: true } 를 돌려주면 커밋하지 않는다.
  */
-export async function saveData(data, message, extraFiles = []) {
+export async function mutateData(apply, message, { attempts = 4 } = {}) {
   if (!hasGithub) throw new Error('GITHUB_TOKEN / GITHUB_REPO 가 설정되지 않았습니다');
-  const files = [
-    { path: DATA_PATH, content: JSON.stringify(data, null, 2) + '\n' },
-    ...extraFiles,
-  ];
-  const sha = await commitFiles(files, message);
-  revalidateTag(TAG);
-  return sha;
+
+  let lastError = null;
+  for (let i = 0; i < attempts; i += 1) {
+    const data = await readDataFresh();
+    const result = (await apply(data)) || {};
+    if (result.skip) return result;
+
+    const files = [
+      { path: DATA_PATH, content: `${JSON.stringify(data, null, 2)}\n` },
+      ...(result.files || []),
+    ];
+    try {
+      const sha = await commitFiles(files, typeof message === 'function' ? message(result) : message);
+      revalidateTag(TAG);
+      return { ...result, sha };
+    } catch (e) {
+      const conflict = e.status === 409 || e.status === 422;
+      if (!conflict || i === attempts - 1) throw e;
+      lastError = e;
+      await sleep(150 * (i + 1));
+    }
+  }
+  throw lastError || new Error('저장에 실패했습니다');
 }
 
 /* ── 조회 헬퍼 ─────────────────────────────────────────── */
@@ -63,16 +85,31 @@ export function postsOf(data, slug, { limit } = {}) {
   return typeof limit === 'number' ? list.slice(0, limit) : list;
 }
 
-export function postsOfGroup(data, group, boards, { limit } = {}) {
-  const set = new Set(boards.map((b) => b.slug));
-  const list = data.posts.filter((p) => set.has(p.board)).sort(cmpDate);
-  return typeof limit === 'number' ? list.slice(0, limit) : list;
-}
-
 export function findPost(data, slug, id) {
   return data.posts.find((p) => p.board === slug && String(p.id) === String(id)) || null;
 }
 
+export function commentsOf(data, slug, postId) {
+  return (data.comments || [])
+    .filter((c) => c.board === slug && String(c.postId) === String(postId))
+    .sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+}
+
+export function commentCount(data, slug, postId) {
+  return (data.comments || []).filter(
+    (c) => c.board === slug && String(c.postId) === String(postId),
+  ).length;
+}
+
+/** 목록에 댓글 수를 채워 넣는다 */
+export function withCounts(data, posts) {
+  return posts.map((p) => ({ ...p, commentCount: commentCount(data, p.board, p.id) }));
+}
+
 function cmpDate(a, b) {
   return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+}
+
+export function newId(prefix) {
+  return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
 }

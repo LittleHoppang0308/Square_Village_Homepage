@@ -29,7 +29,7 @@ export function Systems({ systems }) {
         <div className="sec-head">
           <h2>콘텐츠 &amp; 시스템</h2>
           <span className="note">서버에 실제로 들어가 있는 기능들</span>
-          <Link className="more" href="/board/tip">가이드에서 자세히 <Icon name="arrow" size={13} /></Link>
+          <Link className="more" href="/guide">가이드에서 자세히 <Icon name="arrow" size={13} /></Link>
         </div>
         <div className="sys">
           {systems.map((s) => (
@@ -77,11 +77,11 @@ export function Guides({ guides }) {
       <div className="wrap">
         <div className="sec-head">
           <h2>가이드 둘러보기</h2>
-          <Link className="more" href="/board/tip">전체 가이드 <Icon name="arrow" size={13} /></Link>
+          <Link className="more" href="/guide">전체 가이드 <Icon name="arrow" size={13} /></Link>
         </div>
         <div className="guides">
           {guides.map((g, i) => (
-            <Anchor href={g.href} key={g.id || i}>
+            <Anchor href={g.slug ? `/guide/${g.slug}` : g.href} key={g.slug || g.id || i}>
               <span className="circ"><Icon name={g.icon || 'book'} size={32} /></span>
               <b>{g.name}</b>
             </Anchor>

@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getData, findPost, postsOf } from '@/lib/data';
+import { getData, findPost, postsOf, commentsOf } from '@/lib/data';
 import { board, channelMap } from '@/lib/boards';
 import { buildMenu } from '@/lib/menu';
-import { LAUNCHER_REPO } from '@/lib/env';
+import { getSession } from '@/lib/session';
+import { LAUNCHER_REPO, hasAuth } from '@/lib/env';
 import { ymdhm, toBlocks } from '@/lib/format';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
+import Comments from '@/components/Comments';
+import PostActions from '@/components/PostActions';
 import Icon from '@/components/Icons';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +29,7 @@ export default async function PostPage({ params }) {
   const b = board(slug);
   if (!b) notFound();
 
-  const data = await getData();
+  const [data, user] = await Promise.all([getData(), getSession()]);
   const post = findPost(data, slug, id);
   if (!post) notFound();
 
@@ -36,12 +39,18 @@ export default async function PostPage({ params }) {
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
 
   const { bySlug } = channelMap();
-  const launcherUrl = `https://github.com/${LAUNCHER_REPO}/releases/latest`;
+  const launcherUrl = LAUNCHER_REPO ? `https://github.com/${LAUNCHER_REPO}/releases/latest` : '#';
   const blocks = toBlocks(post.body);
+  const canDelete = Boolean(user && (user.id === post.authorId || user.staff));
 
   return (
     <>
-      <SiteHeader menu={buildMenu(data, { pathname: `/board/${slug}` })} launcherUrl={launcherUrl} />
+      <SiteHeader
+        menu={buildMenu(data, { pathname: `/board/${slug}` })}
+        launcherUrl={launcherUrl}
+        user={user}
+        authEnabled={hasAuth}
+      />
 
       <section>
         <div className="wrap">
@@ -57,20 +66,21 @@ export default async function PostPage({ params }) {
               <b>{post.author}</b>
               <span>{ymdhm(post.createdAt)}</span>
               {post.editedAt ? <span>수정됨</span> : null}
-              {bySlug[slug] ? <span className="ch">#{slug}</span> : null}
+              {post.source === 'web'
+                ? <span className="src">홈페이지</span>
+                : bySlug[slug] ? <span className="ch">#{slug}</span> : null}
               {post.images?.length ? <span>이미지 {post.images.length}장</span> : null}
+              {canDelete ? <span className="amet-right"><PostActions board={slug} id={post.id} /></span> : null}
             </div>
 
             <div className="body">
               {blocks.map((line, i) => (
                 <p key={i}>
-                  {line.length === 0 ? ' ' : line.map((part, j) =>
-                    part.t === 'link' ? (
-                      <a key={j} href={part.v} target="_blank" rel="noopener noreferrer nofollow">{part.v}</a>
-                    ) : (
-                      <span key={j}>{part.v}</span>
-                    ),
-                  )}
+                  {line.length === 0 ? ' ' : line.map((part, j) => (
+                    part.t === 'link'
+                      ? <a key={j} href={part.v} target="_blank" rel="noopener noreferrer nofollow">{part.v}</a>
+                      : <span key={j}>{part.v}</span>
+                  ))}
                 </p>
               ))}
             </div>
@@ -92,6 +102,14 @@ export default async function PostPage({ params }) {
               </span>
             </footer>
           </article>
+
+          <Comments
+            board={slug}
+            postId={String(post.id)}
+            initial={commentsOf(data, slug, post.id)}
+            user={user}
+            authEnabled={hasAuth}
+          />
         </div>
       </section>
 

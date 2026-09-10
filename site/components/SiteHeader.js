@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from './Icons';
+import UserMenu from './UserMenu';
 
 /**
  * 메가 드롭다운 GNB.
  * 하위 목록은 각 열 안에 absolute 로 놓고 폭을 열 폭에 고정(width:100%)한다.
  * 폭을 내용에 맡기면 옆 열과 겹치므로 이 규칙은 바꾸지 말 것.
  */
-export default function SiteHeader({ menu, launcherUrl }) {
+export default function SiteHeader({ menu, launcherUrl, user, authEnabled }) {
   const gnbRef = useRef(null);
   const subRefs = useRef([]);
   const openT = useRef(null);
@@ -146,8 +147,7 @@ export default function SiteHeader({ menu, launcherUrl }) {
             >
               <Icon name="menu" size={20} />
             </button>
-            <button className="icon-btn" aria-label="검색"><Icon name="search" size={18} /></button>
-            <button className="icon-btn" aria-label="내 정보"><Icon name="user" size={18} /></button>
+            <UserMenu user={user} authEnabled={authEnabled} />
             <a className="cta" href={launcherUrl} target="_blank" rel="noopener noreferrer">런처 받기</a>
           </div>
         </div>

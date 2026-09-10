@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getData, postsOf } from '@/lib/data';
+import { getData, postsOf, withCounts } from '@/lib/data';
 import { board, boardsOf, channelMap } from '@/lib/boards';
 import { buildMenu } from '@/lib/menu';
-import { LAUNCHER_REPO } from '@/lib/env';
+import { getSession } from '@/lib/session';
+import { LAUNCHER_REPO, hasAuth } from '@/lib/env';
 import { ago, isNew, isHot } from '@/lib/format';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
@@ -25,19 +26,25 @@ export default async function BoardPage({ params, searchParams }) {
   const b = board(slug);
   if (!b) notFound();
 
-  const data = await getData();
-  const all = postsOf(data, slug);
+  const [data, user] = await Promise.all([getData(), getSession()]);
+  const all = withCounts(data, postsOf(data, slug));
   const pages = Math.max(1, Math.ceil(all.length / PER_PAGE));
   const page = clamp(parseInt(sp?.page ?? '1', 10) || 1, 1, pages);
   const rows = all.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const siblings = boardsOf(b.group);
   const { bySlug } = channelMap();
-  const launcherUrl = `https://github.com/${LAUNCHER_REPO}/releases/latest`;
+  const launcherUrl = LAUNCHER_REPO ? `https://github.com/${LAUNCHER_REPO}/releases/latest` : '#';
+  const canWrite = Boolean(user && (!b.staff || user.staff));
 
   return (
     <>
-      <SiteHeader menu={buildMenu(data, { pathname: `/board/${slug}` })} launcherUrl={launcherUrl} />
+      <SiteHeader
+        menu={buildMenu(data, { pathname: `/board/${slug}` })}
+        launcherUrl={launcherUrl}
+        user={user}
+        authEnabled={hasAuth}
+      />
 
       <section>
         <div className="wrap">
@@ -53,6 +60,13 @@ export default async function BoardPage({ params, searchParams }) {
             <h1>{b.name}</h1>
             <span className="cnt-all">{all.length}개의 글</span>
             {bySlug[slug] ? <span className="ch">#{slug} 채널에서 동기화</span> : null}
+            {canWrite
+              ? <Link className="btn-green wbtn" href={`/board/${slug}/write`}>글쓰기</Link>
+              : user
+                ? null
+                : hasAuth
+                  ? <a className="btn-quiet wbtn" href={`/api/auth/login?next=/board/${slug}`}>로그인하고 쓰기</a>
+                  : null}
           </div>
 
           <nav className="boardnav">
@@ -84,6 +98,7 @@ export default async function BoardPage({ params, searchParams }) {
                     ) : null}
                   </span>
                   <span className="meta">
+                    {p.commentCount ? <span className="cnt num">{p.commentCount}</span> : null}
                     <b>{p.author}</b>
                     <span>{ago(p.createdAt)}</span>
                   </span>
