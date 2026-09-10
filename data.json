@@ -57,22 +57,6 @@
   ],
   "posts": [
     {
-      "id": "c5",
-      "board": "suggest",
-      "title": "데미지 스킨 glyph 크기 조절 옵션 있으면 좋겠어요",
-      "body": "지금 기본 숫자가 좀 작게 나옵니다. 스킨별로 크기를 조절할 수 있으면 좋겠습니다.",
-      "author": "모카",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-08T19:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 1,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "s1",
       "board": "update",
       "title": "26.2 대규모 패치 — 돌파력 시스템 오픈, 공·방·체 30레벨 구조 안내",
