@@ -3,14 +3,12 @@ import { channelMap } from '@/lib/boards';
 import { readDataFresh, mutateData } from '@/lib/data';
 import { newMessages, recentMessages, toPost, fetchAttachments, LIMITS } from '@/lib/discord';
 import { botUserId } from '@/lib/discordApi';
-import { DISCORD_BOT_TOKEN, SYNC_SECRET, CRON_SECRET, hasGithub } from '@/lib/env';
+import { DISCORD_BOT_TOKEN, SYNC_SECRET, CRON_SECRET, SYNC_FIRST_RUN, hasGithub } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-/** 커서가 없는 채널의 첫 수집 건수 */
-const FIRST_RUN_COUNT = 10;
 /** 게시판마다 보관할 최대 글 수 (data.json 이 무한히 커지는 것을 막는다) */
 const KEEP_PER_BOARD = 300;
 
@@ -66,7 +64,7 @@ async function run(req) {
       const cursor = cursors[channelId];
       const msgs = cursor
         ? await newMessages(channelId, cursor)
-        : await recentMessages(channelId, FIRST_RUN_COUNT);
+        : await recentMessages(channelId, SYNC_FIRST_RUN);
 
       let count = 0;
       for (const msg of msgs) {

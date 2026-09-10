@@ -18,6 +18,9 @@ export const AUTH_SECRET = process.env.AUTH_SECRET || '';
 /** 웹에서 쓴 글·댓글을 디스코드 채널로도 보낼지 ("0"/"off" 면 끔) */
 export const DISCORD_MIRROR = !/^(0|off|false)$/i.test(process.env.DISCORD_MIRROR || '1');
 
+/** 커서가 없는 채널(=처음 연결한 채널)에서 한 번에 가져올 과거 글 수. 1~100 */
+export const SYNC_FIRST_RUN = Math.min(100, Math.max(1, parseInt(process.env.SYNC_FIRST_RUN || '10', 10) || 10));
+
 export const SYNC_SECRET = process.env.SYNC_SECRET || '';
 export const CRON_SECRET = process.env.CRON_SECRET || '';
 

@@ -39,9 +39,9 @@ export async function newMessages(channelId, afterId) {
     .sort((a, b) => (BigInt(a.id) < BigInt(b.id) ? -1 : 1));
 }
 
-/** 커서가 없는 첫 실행에서는 최근 몇 건만 가져온다 */
+/** 커서가 없는 첫 실행 — 최근 글을 한 번에 가져온다 (디스코드 상한 100건) */
 export async function recentMessages(channelId, count) {
-  const list = await dc(`/channels/${channelId}/messages?limit=${Math.min(count, 50)}`);
+  const list = await dc(`/channels/${channelId}/messages?limit=${Math.min(Math.max(count, 1), 100)}`);
   return list
     .filter(isUsable)
     .sort((a, b) => (BigInt(a.id) < BigInt(b.id) ? -1 : 1));

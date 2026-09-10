@@ -111,9 +111,11 @@ createServer(async (req, res) => {
   let m = p.match(/^\/dc\/channels\/(\d+)\/messages$/);
   if (m) {
     const after = url.searchParams.get('after');
+    const limit = Math.min(Number(url.searchParams.get('limit') || 50), 100);
     let list = messages[m[1]] || [];
     if (after) list = list.filter((x) => BigInt(x.id) > BigInt(after));
-    return json([...list].reverse()); // 디스코드는 최신순으로 준다
+    // 디스코드는 최신순으로 주고, limit 만큼만 준다
+    return json([...list].reverse().slice(0, limit));
   }
 
   // ── GitHub ──
