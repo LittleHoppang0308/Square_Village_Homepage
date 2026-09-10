@@ -1,0 +1,385 @@
+{
+  "settings": {
+    "serverName": "스퀘어빌리지",
+    "serverVersion": "Paper 26.2 / Fabric",
+    "launcher": {
+      "version": "v1.4.2",
+      "file": "SquareVillage-Setup.exe",
+      "platform": "Windows 64bit",
+      "releasedAt": "2026.09.06"
+    },
+    "discordInvite": ""
+  },
+  "banners": [
+    {
+      "id": "b1",
+      "theme": "dusk",
+      "tag": "업데이트",
+      "navLabel": "돌파력 시스템 오픈",
+      "title": "돌파력,//끝이 없는 성장의 시작",
+      "desc": "공격력·방어력·체력을 각 30레벨까지 올리면 돌파 단계가 +1. 누적 레벨은 초기화되지 않으니 올린 만큼 그대로 남습니다.",
+      "cta": "패치 노트 보기",
+      "href": "/board/patch"
+    },
+    {
+      "id": "b2",
+      "theme": "night",
+      "tag": "이벤트",
+      "chip": "quiet",
+      "navLabel": "추석 보름달 사냥",
+      "title": "추석 보름달 사냥",
+      "desc": "9월 12일부터 22일까지, 밤 시간대 사냥터에서 경험치 2배 물약과 보름달 상자가 드롭됩니다.",
+      "cta": "이벤트 상세",
+      "href": "/board/event"
+    },
+    {
+      "id": "b3",
+      "theme": "sand",
+      "tag": "시스템",
+      "chip": "quiet",
+      "navLabel": "성장 강화 안내",
+      "title": "성장 강화, 별을 하나 더",
+      "desc": "주문서 강화와 별개로 쌓이는 별 단계. 파괴되어도 무기의 영혼이 남아 원본을 그대로 복구할 수 있습니다.",
+      "cta": "확률표 보기",
+      "href": "/#sys-STAR"
+    },
+    {
+      "id": "b4",
+      "theme": "teal",
+      "tag": "신규 안내",
+      "navLabel": "신규 유저 시작 가이드",
+      "title": "처음 오셨나요?",
+      "desc": "런처 하나로 모드 설치까지 자동. 첫 접속 시 기본템 세트를 받고 바로 시작합니다.",
+      "cta": "런처 다운로드",
+      "icon": "download",
+      "href": "https://github.com/LittleHoppang0308/squarevillage-launcher/releases/latest"
+    }
+  ],
+  "posts": [
+    {
+      "id": "s1",
+      "board": "update",
+      "title": "26.2 대규모 패치 — 돌파력 시스템 오픈, 공·방·체 30레벨 구조 안내",
+      "body": "돌파력이 열렸습니다.\n\n공격력·방어력·체력을 각각 30레벨까지 올리면 돌파 단계가 +1 오르고 진행도가 초기화됩니다.\n누적 레벨 기준으로 능력치를 계산하므로 초기화되어도 올린 만큼은 그대로 남습니다.\n\n세 스탯을 균등하게 올려야 단계가 오릅니다. 한 스탯만 올리면 30에서 막힙니다.",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-07T21:00:00Z",
+      "editedAt": null,
+      "reactions": 4,
+      "commentCount": 5,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "s2",
+      "board": "update",
+      "title": "몬스터 드롭 개편 — 막타 30초 소유 후 60초 전체 공개로 변경",
+      "body": "드롭 규칙을 정리했습니다.\n\n· 막타를 낸 사람이 30초간 단독 소유\n· 이후 60초는 누구나 주울 수 있음\n· 그 뒤 소멸\n\n랜덤 스탯이 굴려진 장비가 떨어지며, 드롭 시 튀어오르는 연출과 빔 이펙트가 함께 나옵니다.",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-04T21:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 3,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "s3",
+      "board": "event",
+      "title": "추석 보름달 사냥 — 경험치 2배 물약 & 보름달 상자 드롭",
+      "body": "9월 12일 ~ 9월 22일\n\n밤 시간대 사냥터에서 경험치 2배 물약과 보름달 상자가 추가로 드롭됩니다.\n보름달 상자에서는 강화 주문서와 파괴 방지권이 나옵니다.",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-02T21:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 0,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "s4",
+      "board": "patch",
+      "title": "강화 쿨타임 1.2초 적용 · 스타포스 파괴 방지권 가격 조정",
+      "body": "· 강화 연출이 끝나기 전에는 다시 강화할 수 없도록 1.2초 쿨타임을 넣었습니다.\n· 성장 강화 파괴 방지 비용을 단계별로 다시 잡았습니다.\n· 사망 시 레벨 표시가 사라지던 문제를 고쳤습니다.",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-08-29T21:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 0,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "s5",
+      "board": "notice",
+      "title": "길드 창설 비용 인하 및 길드 스탯 최대 레벨 상향 안내",
+      "body": "길드 창설 비용을 내리고 길드 스탯 최대 레벨을 올렸습니다.\n후원금은 길드 예산이 되고, 길드장이 구매한 길드 스탯은 길드원 전원에게 버프로 들어갑니다.",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-08-26T21:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 0,
+      "images": [],
+      "pinned": true,
+      "source": "seed"
+    },
+    {
+      "id": "c1",
+      "board": "shot",
+      "title": "스타포스 12성 성공했습니다 (feat. 파괴방지권 3장)",
+      "body": "드디어 성공했습니다. 방지권 3장 태웠습니다...",
+      "author": "하늘",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-09T20:48:00Z",
+      "editedAt": null,
+      "reactions": 9,
+      "commentCount": 8,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "c2",
+      "board": "guild",
+      "title": "[반짝반짝] 주말 보스 같이 도실 분 5자리 남았어요",
+      "body": "주말 저녁 9시에 모여서 보스 돕니다.\n레벨 제한은 80 이상이고, 길드 스탯은 전부 5레벨까지 올려뒀습니다.",
+      "author": "블루베리",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-09T20:00:00Z",
+      "editedAt": null,
+      "reactions": 2,
+      "commentCount": 6,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "c3",
+      "board": "tip",
+      "title": "토템 특효 대상 세팅 정리 — 물리/마법 분리 기준",
+      "body": "토템의 특효 대상은 때린 몹 이름으로 부분 일치 판정됩니다.\n활·석궁 공격은 마법 판정이고 나머지는 물리 판정이라, 무기 보석과 토템을 같은 계열로 맞추는 게 효율이 좋습니다.",
+      "author": "감자칩",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-09T18:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 4,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "c4",
+      "board": "free",
+      "title": "돌파력은 공·방·체 균등하게 올려야 단계가 오릅니다",
+      "body": "한 스탯만 올리면 그 스탯이 30에서 막혀서 돌파 단계가 안 오릅니다. 세 개 같이 올리세요.",
+      "author": "야채호빵",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-09T16:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 2,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "c5",
+      "board": "suggest",
+      "title": "데미지 스킨 glyph 크기 조절 옵션 있으면 좋겠어요",
+      "body": "지금 기본 숫자가 좀 작게 나옵니다. 스킨별로 크기를 조절할 수 있으면 좋겠습니다.",
+      "author": "모카",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-08T19:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 1,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "c6",
+      "board": "tip",
+      "title": "일일 퀘스트 12시간 리셋 시간대별 효율 정리",
+      "body": "일일 퀘스트는 수락 후 12시간 뒤에 다시 받을 수 있습니다. 접속 시간대를 기준으로 아침/저녁 두 번 도는 게 가장 효율이 좋습니다.",
+      "author": "라온",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-08T15:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 3,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    },
+    {
+      "id": "c7",
+      "board": "qna",
+      "title": "보석은 무기랑 방어구 슬롯이 따로인가요?",
+      "body": "무기 보석은 6번, 방어구 보석은 8번 슬롯입니다. 역할이 고정이라 무기 보석은 공격력 %, 방어구 보석은 방어 %만 붙습니다.",
+      "author": "감자칩",
+      "fromBot": false,
+      "channelId": "",
+      "createdAt": "2026-09-07T17:00:00Z",
+      "editedAt": null,
+      "reactions": 0,
+      "commentCount": 2,
+      "images": [],
+      "pinned": false,
+      "source": "seed"
+    }
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "tag": "진행 중",
+      "title": "추석 보름달 사냥",
+      "desc": "09.12 ~ 09.22 · 밤 시간대 경험치 2배 & 보름달 상자",
+      "href": "/board/event"
+    },
+    {
+      "id": "e2",
+      "tag": "상시",
+      "title": "신규 주민 이주 지원",
+      "desc": "첫 접속 시 기본템 세트 + 초심자 전용 퀘스트 라인 지급",
+      "href": "/board/notice"
+    }
+  ],
+  "videos": [
+    {
+      "id": "v1",
+      "title": "돌파력 시스템 완전 정리 — 어디에 먼저 투자할까",
+      "duration": "08:12",
+      "href": ""
+    },
+    {
+      "id": "v2",
+      "title": "12성 도전 생방송 — 파괴방지권 다 태운 날",
+      "duration": "14:39",
+      "href": ""
+    },
+    {
+      "id": "v3",
+      "title": "런처 설치부터 첫 사냥까지 5분 안내",
+      "duration": "05:47",
+      "href": ""
+    },
+    {
+      "id": "v4",
+      "title": "길드 스탯 우선순위와 후원금 운영법",
+      "duration": "11:02",
+      "href": ""
+    }
+  ],
+  "guides": [
+    {
+      "id": "g1",
+      "name": "첫걸음",
+      "icon": "book",
+      "href": "/board/tip"
+    },
+    {
+      "id": "g2",
+      "name": "스탯 분배",
+      "icon": "gem",
+      "href": "/board/tip"
+    },
+    {
+      "id": "g3",
+      "name": "강화 확률표",
+      "icon": "anvil",
+      "href": "/board/tip"
+    },
+    {
+      "id": "g4",
+      "name": "길드 운영",
+      "icon": "flag",
+      "href": "/board/tip"
+    },
+    {
+      "id": "g5",
+      "name": "퀘스트 목록",
+      "icon": "map",
+      "href": "/board/tip"
+    },
+    {
+      "id": "g6",
+      "name": "드롭 테이블",
+      "icon": "sword",
+      "href": "/board/tip"
+    },
+    {
+      "id": "g7",
+      "name": "보석 · 토템",
+      "icon": "dagger",
+      "href": "/board/tip"
+    }
+  ],
+  "systems": [
+    {
+      "code": "STAT",
+      "name": "스탯 6종 직접 분배",
+      "desc": "레벨업으로 받은 SP를 힘·체력·행운·방어·민첩에 원하는 대로. 로어에 실제 적용 수치가 그대로 표시됩니다."
+    },
+    {
+      "code": "GEAR",
+      "name": "장비 16슬롯",
+      "desc": "무기 1 · 방어구 4 · 악세서리 6 · 특수 4(영혼석·토템·보조무기·전투특성) · 치장 1. 착용 레벨 미달이면 스탯이 적용되지 않습니다."
+    },
+    {
+      "code": "SCROLL",
+      "name": "주문서 강화",
+      "desc": "단계마다 성공률이 내려가고, 단계별 성공 공지가 서버 전체에 뜹니다. 하락 방지는 돈, 파괴 방지는 돈 + 방지권."
+    },
+    {
+      "code": "STAR",
+      "name": "성장 강화",
+      "star": true,
+      "desc": "주문서와 별개로 쌓이는 별 단계. 파괴되면 무기의 영혼이 남아 영혼 복구 주문서로 원본을 되살립니다."
+    },
+    {
+      "code": "BREAK",
+      "name": "돌파력",
+      "desc": "공격력·방어력·체력을 각 30레벨까지 올리면 돌파 단계 +1. 누적 레벨 기준이라 리셋되어도 능력치는 그대로 남습니다."
+    },
+    {
+      "code": "GUILD",
+      "name": "길드 & 길드 스탯",
+      "desc": "후원금이 길드 예산이 되고, 길드장이 구매한 길드 스탯은 길드원 전원에게 버프로 들어갑니다."
+    },
+    {
+      "code": "QUEST",
+      "name": "퀘스트 & NPC 대화",
+      "desc": "사냥 · 수집 · 대화 목표에 일회 / 반복 / 일일 12시간 모드. 선행 퀘스트를 끝내야 열리는 연계 라인도 있습니다."
+    },
+    {
+      "code": "DROP",
+      "name": "몬스터 드롭",
+      "desc": "막타를 낸 사람이 30초간 단독 소유, 이후 60초는 전체 공개. 랜덤 스탯이 굴려진 장비가 떨어집니다."
+    }
+  ],
+  "sync": {
+    "lastRunAt": "2026-09-09T20:56:00Z",
+    "cursors": {}
+  }
+}

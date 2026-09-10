@@ -1,0 +1,35 @@
+name: 디스코드 동기화
+
+# Vercel 무료 플랜의 Cron 은 하루 1회만 돌 수 있어서, 5분 주기는 GitHub Actions 로 돈다.
+# (Actions 의 최소 주기가 5분이고, 공개 저장소는 무료 / 비공개도 월 2000분 안에 들어온다)
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: discord-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 동기화 호출
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
+        run: |
+          set -u
+          code=$(curl -sS -o body.txt -w '%{http_code}' \
+            -X POST "${SITE_URL%/}/api/sync/discord" \
+            -H "Authorization: Bearer ${SYNC_SECRET}" \
+            --max-time 120 || echo 000)
+          echo "HTTP $code"
+          cat body.txt || true
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::동기화 실패 (HTTP $code)"
+            exit 1
+          fi
