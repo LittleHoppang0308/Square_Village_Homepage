@@ -73,22 +73,6 @@
       "source": "seed"
     },
     {
-      "id": "c3",
-      "board": "tip",
-      "title": "토템 특효 대상 세팅 정리 — 물리/마법 분리 기준",
-      "body": "토템의 특효 대상은 때린 몹 이름으로 부분 일치 판정됩니다.\n활·석궁 공격은 마법 판정이고 나머지는 물리 판정이라, 무기 보석과 토템을 같은 계열로 맞추는 게 효율이 좋습니다.",
-      "author": "감자칩",
-      "fromBot": false,
-      "channelId": "",
-      "createdAt": "2026-09-09T18:00:00Z",
-      "editedAt": null,
-      "reactions": 0,
-      "commentCount": 4,
-      "images": [],
-      "pinned": false,
-      "source": "seed"
-    },
-    {
       "id": "c5",
       "board": "suggest",
       "title": "데미지 스킨 glyph 크기 조절 옵션 있으면 좋겠어요",
